@@ -26,8 +26,7 @@ def compute_accuracy(model, data_loader, device):
     model.eval()
     with torch.no_grad():
         correct_pred, num_examples = 0, 0
-        for i, (features, targets) in enumerate(data_loader):
-
+        for features, targets in data_loader:
             features = features.to(device)
             targets = targets.to(device)
 
@@ -90,10 +89,14 @@ def train_classifier_simple_v2(
         elapsed = (time.time() - epoch_start_time) / 60
         print(f"Time / epoch without evaluation: {elapsed:.2f} min")
         with torch.no_grad():  # save memory during inference
-            if not skip_train_acc:
-                train_acc = compute_accuracy(model, train_loader, device=device).item()
-            else:
-                train_acc = float("nan")
+            train_acc = (
+                float("nan")
+                if skip_train_acc
+                else compute_accuracy(
+                    model, train_loader, device=device
+                ).item()
+            )
+
             valid_acc = compute_accuracy(model, valid_loader, device=device).item()
             train_acc_list.append(train_acc)
             valid_acc_list.append(valid_acc)
@@ -209,11 +212,7 @@ class LeNet5(nn.Module):
         self.grayscale = grayscale
         self.num_classes = num_classes
 
-        if self.grayscale:
-            in_channels = 1
-        else:
-            in_channels = 3
-
+        in_channels = 1 if self.grayscale else 3
         self.features = nn.Sequential(
             nn.Conv2d(in_channels, 6, kernel_size=5),
             nn.Tanh(),
@@ -234,8 +233,7 @@ class LeNet5(nn.Module):
     def forward(self, x):
         x = self.features(x)
         x = torch.flatten(x, 1)
-        logits = self.classifier(x)
-        return logits
+        return self.classifier(x)
 
 
 if __name__ == "__main__":

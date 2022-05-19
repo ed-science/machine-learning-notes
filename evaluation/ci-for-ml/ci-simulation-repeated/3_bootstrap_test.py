@@ -29,8 +29,7 @@ def run_method(num_repetitions):
 
         test_accuracies = []
 
-        for i in range(200):
-
+        for _ in range(200):
             pred_idx = rng.choice(idx, size=idx.shape[0], replace=True)
             acc_test_boot = np.mean(predictions_test[pred_idx] == y_test[pred_idx])
             test_accuracies.append(acc_test_boot)
