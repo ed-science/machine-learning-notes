@@ -7,6 +7,8 @@ import numpy as np
 def run_method(num_repetitions):
     is_inside_list = []
 
+    bootstrap_rounds = 200
+
     for i in range(num_repetitions):
 
         X_train, y_train, X_test, y_test, X_huge_test, y_huge_test = get_dataset(
@@ -26,10 +28,7 @@ def run_method(num_repetitions):
         idx = np.arange(y_train.shape[0])
 
         bootstrap_train_accuracies = []
-        bootstrap_rounds = 200
-
-        for i in range(bootstrap_rounds):
-
+        for _ in range(bootstrap_rounds):
             train_idx = rng.choice(idx, size=idx.shape[0], replace=True)
             valid_idx = np.setdiff1d(idx, train_idx, assume_unique=False)
 
